@@ -7,7 +7,7 @@ from sqlalchemy import func
 session = Session(engine)
 
 
-def find_5_most_success_students():
+def select_1():
     top_students = (
         session.query(Student, func.avg(Grade.grade_value).label("avg_grade"))
         .join(Grade, Grade.student_id == Student.id)
@@ -19,7 +19,7 @@ def find_5_most_success_students():
     return top_students
 
 
-def find_best_student_from_subject(subject_name):
+def select_2(subject_name):
     result = (
         session.query(Student, func.avg(Grade.grade_value).label("avg_grade"))
         .join(Grade, Grade.student_id == Student.id)
@@ -35,7 +35,7 @@ def find_best_student_from_subject(subject_name):
 def find_best_student_for_all_subjects():
     all_subjects = session.query(Subject).all()
     for subject in all_subjects:
-        student_avg = find_best_student_from_subject(subject.name)
+        student_avg = select_2(subject.name)
         if student_avg:
             student, avg_grade = student_avg
             print(
@@ -43,7 +43,7 @@ def find_best_student_for_all_subjects():
             )
 
 
-def find_average_score_per_groups_for_subject(subject_name):
+def select_3(subject_name):
     results = (
         session.query(Group.name, func.avg(Grade.grade_value).label("avg_grade"))
         .join(Student, Student.group_id == Group.id)
@@ -60,17 +60,17 @@ def find_average_score_per_groups_for_all_subject():
     all_subjects = session.query(Subject).all()
     for subject in all_subjects:
         print(f"\nСередній бал у групах з предмету '{subject.name}':")
-        results = find_average_score_per_groups_for_subject(subject.name)
+        results = select_3(subject.name)
         for group_name, avg_grade in results:
             print(f"{group_name}: {avg_grade:.2f}")
 
 
-def find_average_score_all():
+def select_4():
     avg = session.query(func.avg(Grade.grade_value)).scalar()
     print(f"Середній бал на потоці: {avg:.2f}")
 
 
-def find_subject_by_teacher(teacher_name):
+def select_5(teacher_name):
     subjects = (
         session.query(Subject)
         .join(Teacher, Subject.teacher_id == Teacher.id)
@@ -86,10 +86,10 @@ def find_subject_by_teacher(teacher_name):
 def find_subjects_for_all_teachers():
     teachers = session.query(Teacher).all()
     for teacher in teachers:
-        find_subject_by_teacher(teacher.name)
+        select_5(teacher.name)
 
 
-def find_students_in_group(group_name):
+def select_6(group_name):
     students_in_group = (
         session.query(Student)
         .join(Group, Student.group_id == Group.id)
@@ -105,10 +105,10 @@ def find_students_in_group(group_name):
 def find_students_in_groups():
     groups = session.query(Group).all()
     for group in groups:
-        find_students_in_group(group.name)
+        select_6(group.name)
 
 
-def find_subject_grades_in_group(subject_name, group_name):
+def select_7(subject_name, group_name):
     grades = (
         session.query(Student.name, Grade.grade_value)
         .join(Group, Student.group_id == Group.id)
@@ -135,10 +135,10 @@ def find_student_grades_in_all_subjects_per_groups():
     subjects = session.query(Subject).all()
     for group in groups:
         for subject in subjects:
-            find_subject_grades_in_group(subject.name, group.name)
+            select_7(subject.name, group.name)
 
 
-def find_average_grade_for_teacher(teacher_name):
+def select_8(teacher_name):
     avg_grade = (
         session.query(func.avg(Grade.grade_value))
         .join(Subject, Subject.id == Grade.subject_id)
@@ -155,10 +155,10 @@ def find_average_grade_for_teacher(teacher_name):
 def find_average_grade_for_teachers():
     teachers = session.query(Teacher).all()
     for teacher in teachers:
-        find_average_grade_for_teacher(teacher.name)
+        select_8(teacher.name)
 
 
-def find_subjects_for_student(student_name):
+def select_9(student_name):
     subjects = (
         session.query(Subject.name)
         .join(Grade, Grade.subject_id == Subject.id)
@@ -176,10 +176,10 @@ def find_subjects_for_student(student_name):
 def find_subjects_for_students():
     students = session.query(Student).all()
     for student in students:
-        find_subjects_for_student(student.name)
+        select_9(student.name)
 
 
-def find_subject_for_student_with_teacher(student_name, teacher_name):
+def select_10(student_name, teacher_name):
     subjects = (
         session.query(Subject.name)
         .join(Grade, Grade.subject_id == Subject.id)
@@ -201,17 +201,17 @@ def find_subjects_for_students_with_teacher():
     teachers = session.query(Teacher).all()
     for student in students:
         for teacher in teachers:
-            find_subject_for_student_with_teacher(student.name, teacher.name)
+            select_10(student.name, teacher.name)
 
 
-top_students = find_5_most_success_students()
+top_students = select_1()
 print("Топ 5 студентів за середнім балом:")
 for student, avg in top_students:
     print(f"{student.name}: {avg:.2f}")
 
 find_best_student_for_all_subjects()
 find_average_score_per_groups_for_all_subject()
-find_average_score_all()
+select_4()
 find_subjects_for_all_teachers()
 find_students_in_groups()
 find_student_grades_in_all_subjects_per_groups()
